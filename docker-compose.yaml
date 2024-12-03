@@ -1,0 +1,91 @@
+services:
+  n8n:
+    image: docker.n8n.io/n8nio/n8n
+    container_name: n8n
+    environment:
+      - N8N_SECURE_COOKIE=false
+    ports:
+      - "5678:5678"
+    volumes:
+      - n8n_data:/home/node/.n8n
+    networks:
+      - ai_lab_network
+
+  chroma:
+    image: chromadb/chroma:0.5.5
+    container_name: chroma
+    environment:
+      - ALLOW_RESET=true
+    ports:
+      - "8000:8000"
+    volumes:
+      - chroma_data:/chroma/chroma
+    networks:
+      - ai_lab_network
+
+  openwebui:
+    image: ghcr.io/open-webui/open-webui:main
+    container_name: openwebui
+    environment:
+      - VECTOR_DB=chroma
+      - OLLAMA_BASE_URL=http://ollama:11434
+      - CHROMA_HTTP_HOST=chroma
+      - CHROMA_HTTP_PORT=8000
+      - RAG_EMBEDDING_ENGINE=ollama
+      - RAG_EMBEDDING_MODEL=mxbai-embed-large
+      # - WEBUI_AUTH=false
+      - ENABLE_OPENAI_API=false
+      - DEFAULT_MODELS=llama3.2:latest
+    ports:
+      - "8080:8080"
+    volumes:
+      - openwebui_data:/app/backend/data
+    networks:
+      - ai_lab_network
+
+  ollama:
+    image: ollama/ollama
+    container_name: ollama
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+    networks:
+      - ai_lab_network
+    depends_on:
+      - chroma
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - capabilities: [gpu]
+              count: all       
+
+  ollama-embed:
+    image: ollama/ollama
+    container_name: ollama-embed
+    ports:
+      - "11430:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+    networks:
+      - ai_lab_network
+    depends_on:
+      - ollama
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - capabilities: [gpu]
+              count: all              
+
+volumes:
+  n8n_data:
+  chroma_data:
+  openwebui_data:
+  ollama_data:
+  qdrant_data:
+  
+networks:
+  ai_lab_network:
+    driver: bridge
