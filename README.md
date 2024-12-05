@@ -35,6 +35,10 @@ podman exec -it ollama-embed ollama list
 - Modify embedding url
   - http://ollama-embed:11434
 
+## n8n
+- Create Admin
+  - admin@bp.ai / Bpai1234
+
 ## CUDA
 ### Podman GPU Support
 > https://podman-desktop.io/docs/podman/gpu
