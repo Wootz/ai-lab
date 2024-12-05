@@ -27,13 +27,16 @@ podman exec -it ollama-embed ollama pull mxbai-embed-large
 podman exec -it ollama-embed ollama list
 ```
 
-## Open WebUI
+## Configure Open WebUI
 - Create Admin
   - admin@bp.ai / bpai123
 - Disable Arena model
 - Disable embedding model
 - Modify embedding url
   - http://ollama-embed:11434
+- Settings > Connections > OpenAI API 
+  - http://pipeline:9099
+  - 0p3n-w3bu!
 
 ## n8n
 - Create Admin
